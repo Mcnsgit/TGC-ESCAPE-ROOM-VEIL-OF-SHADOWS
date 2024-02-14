@@ -1,5 +1,5 @@
-const Inquirer = require('inquirer');
-const styles = require('../utils/chalkStyles');
+import Inquirer from 'inquirer'; // Import Inquirer module
+import styles from '../utils/chalkStyles'; // Import styles module
 
 class PuzzleManager {
     constructor() {
@@ -7,7 +7,8 @@ class PuzzleManager {
             decryptMessage: {
                 description: "You've received an encrypted message from Elena Martinez, a former government epidemiologist who quit after having found out the truth about the origins of the pandemic.",
                 question: "I hope you can understand the risks uncovering the truth will bring, I've had to encrypt any important details in this message hope you got what it takes to uncover the truth and help us expose it.",
-                hint: "The message is encrypted with a combination of letters and numbers."
+                hint: "The message is encrypted with a combination of letters and numbers.",
+                correctAnswer: "CORRECT_ANSWER" // Add the correct answer property
             }
         };
     }
@@ -44,4 +45,4 @@ class PuzzleManager {
     }
 }
 
-export default PuzzleManager()
+export default PuzzleManager;

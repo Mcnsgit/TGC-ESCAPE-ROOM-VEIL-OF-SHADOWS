@@ -1,10 +1,10 @@
-const Inquirer = require('inquirer');
-const Chalk = require('chalk');
-const fs = require('fs');
-const path = require('path');
-const PuzzleManager = require('./puzzleManager');
-const NarrativeManager = require('./narrativeManager');
-const styles = require('../utils/chalkStyles'); 
+import { prompt } from 'inquirer';
+import { red, yellow, green } from 'chalk';
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
+import PuzzleManager from './puzzleManager.js';
+import NarrativeManager from './narrativeManager.js';
+import styles from '../utils/chalkStyles.js'; // Assuming ES6 import syntax
 
 class Player {
     constructor(name, playerClass) {
@@ -24,59 +24,34 @@ class GameManager {
         this.narrativeManager = new NarrativeManager(); 
     }
 
-    
     loadAsciiArt(filename) {
         try {
-            const artPath = path.join(__dirname, '..', 'assets', filename);
-            return fs.readFileSync(artPath, 'utf8');
+            const artPath = join(__dirname, '..', 'assets', filename);
+            return readFileSync(artPath, 'utf8');
         } catch (error) {
-            console.error(Chalk.red(`Failed to load ASCII art from ${filename}: ${error}`));
+            console.error(red(`Failed to load ASCII art from ${filename}: ${error}`));
             return '';
         }
     }
 
-
     async initializeGame() {
-        console.log(styles.title('VEIL OF SHADOWS'));
-        console.log(Chalk.yellow('A journey through shadows and truths awaits you.'));
-        const asciiArt = this.loadAsciiArt('ascii-art(1).txt'); // Ensure the ASCII art file is correctly named and located
-        console.log(Chalk.yellow(asciiArt));
+        console.log(title('VEIL OF SHADOWS'));
+        console.log(yellow('A journey through shadows and truths awaits you.'));
+        const asciiArt = this.loadAsciiArt('ascii-art.txt'); // Ensure this is the correct filename
+        console.log(yellow(asciiArt));
 
         const playerName = await this.promptForPlayerName();
-        this.player = new Player(playerName);
+        this.player = new Player(playerName, null); // Initially, player class is null until chosen
         await this.promptForPlayerClass();
 
-        console.log(Chalk.yellow(`Welcome, ${this.player.name}. You're about to embark on a journey where every decision matters, and the truth is more elusive than it appears. Are you ready to lift the veil of shadows?`));
-
+        console.log(yellow(`Welcome, ${this.player.name}. Are you ready to lift the veil of shadows?`));
         this.startGameLoop();
     }
 
-    async promptForPlayerName() {
-        const response = await Inquirer.prompt({
-            name: 'playerName',
-            type: 'input',
-            message: 'What is your name?',
-        });
-        return response.playerName;
-    }
-
-    async promptForPlayerClass() {
-        const response = await Inquirer.prompt({
-            name: 'class',
-            type: 'list',
-            message: 'Choose your class:',
-            choices: ['Investigator', 'Scientist', 'Hacker'],
-        });
-        this.player.class = response.class;
-        console.log(Chalk.yellow(`${this.player.name} has chosen the class: ${this.player.class}.`));
-    }
-
     async startGameLoop() {
-        console.log(Chalk.yellow('The adventure begins...'));
         let gameOver = false;
 
         while (!gameOver) {
-            // This switch structure can be expanded with additional cases as the game develops
             switch (this.gameState.currentScene) {
                 case 'introduction':
                     await this.narrativeManager.displayIntroduction();
@@ -90,24 +65,17 @@ class GameManager {
                     this.checkPuzzleOutcome();
                     break;
                 default:
-                    console.log(Chalk.red('The journey concludes... for now.'));
+                    console.log(red('The journey concludes... for now.'));
                     gameOver = true;
                     break;
             }
         }
 
-        console.log(Chalk.green('Thank you for playing Veil of Shadows.'));
+        console.log(green('Thank you for playing Veil of Shadows.'));
     }
 
-    // Method for transitioning to different scenes
-    transitionToScene(sceneId) {
-        console.log(Chalk.yellow(`Transitioning to scene: ${sceneId}`));
-        this.gameState.currentScene = sceneId;
-    }
-
-    // Placeholder method for choosing game difficulty
     async chooseDifficulty() {
-        const response = await Inquirer.prompt({
+        const response = await prompt({
             name: 'difficulty',
             type: 'list',
             message: 'Select game difficulty:',
@@ -117,12 +85,60 @@ class GameManager {
         this.transitionToScene('firstPuzzle');
     }
 
-    // Checking the outcome of puzzles and making decisions based on that
-    checkPuzzleOutcome() {
-        // This method should be filled with logic to check if a puzzle was solved and decide what happens next
+    async promptForPlayerName() {
+        const response = await prompt({
+            name: 'playerName',
+            type: 'input',
+            message: 'What is your name?',
+        });
+        return response.playerName;
     }
 
-    // Additional utility methods such as saving/loading game state can be added here
+    async promptForPlayerClass() {
+        const response = await prompt({
+            name: 'class',
+            type: 'list',
+            message: 'Choose your class:',
+            choices: ['Investigator', 'Scientist', 'Hacker'],
+        });
+        this.player.class = response.class;
+        console.log(yellow(`${this.player.name} has chosen the class: ${this.player.class}.`));
+    }
+
+    transitionToScene(sceneId) {
+        console.log(yellow(`Transitioning to scene: ${sceneId}`));
+        this.gameState.currentScene = sceneId;
+    }
+
+    checkPuzzleOutcome() {
+        if (this.gameState.puzzleOutcome === true) {
+            console.log(success('Puzzle solved successfully!'));
+            this.transitionToScene('nextScene');
+        } else {
+            console.log(error('Puzzle was not solved. Try again?'));
+            this.transitionToScene('retryPuzzle');
+        }
+    }
+
+    saveGame() {
+        const saveData = JSON.stringify(this.gameState);
+        writeFileSync('gameSave.json', saveData, 'utf8');
+        console.log(info('Game saved successfully.'));
+    }
+
+
+    loadGame() {
+        try {
+            const saveData = fs.readFileSync('gameSave.json', 'utf8');
+            this.gameState = JSON.parse(saveData);
+            console.log(styles.info('Game loaded successfully.'));
+            // After loading, you may want to transition to the appropriate scene
+            this.transitionToScene(this.gameState.currentScene);
+        } catch (error) {
+            console.error(styles.error('Failed to load game.'));
+        }
+    }
 }
 
 module.exports = GameManager;
+

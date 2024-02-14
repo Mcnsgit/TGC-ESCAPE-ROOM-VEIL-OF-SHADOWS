@@ -1,6 +1,7 @@
-const chalk = require('chalk');
+import chalk from 'chalk';
 
-const styles = {
+export const styles = () => ({
+
     narrative:chalk.hex('#F0EAD6'),
     npcDialogue: chalk.cyan.bold,
     playerDialogue: chalk.green,
@@ -11,6 +12,6 @@ const styles = {
     systemMessage: chalk.blue,
     title: chalk.hex('#FFA07A').bold,
     option:chalk.hex('#DAA520').bold,
-};
+});
 
 module.exports = styles;
