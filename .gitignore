@@ -1,0 +1,9 @@
+node_modules
+.gitattributes
+
+# Ignore all .DS_Store files
+.DS_Store
+
+# Ignore all .env files
+.env
+.REAdME.md

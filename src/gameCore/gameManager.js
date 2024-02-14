@@ -1,6 +1,9 @@
-// Required modules and classes
+// Rewritten code to fix performance issues
+
 const Inquirer = require('inquirer');
 const Chalk = require('chalk');
+const path = require('path');
+const fs = require('fs');
 const PuzzleManager = require('./puzzleManager');
 const NarrativeManager = require('../narrative/narrativeManager');
 const Player = require('./Player');
@@ -13,32 +16,57 @@ class GameManager {
     }
 
     // Initializes the game, setting up the player and initial game state
-    initializeGame = async () => {
+    async initializeGame() {
         try {
-            playerName = await Inquirer.prompt({
+            const playerName = (await Inquirer.prompt({
                 name: 'playerName',
                 type: 'input',
                 message: 'What is your name?',
-            });
-            this.console.log(Chalk.yellow('Welcome, ' + playerName + "You're about to embark on a journey where every decision matters, and the truth is more elusive than it appears. Are you ready to lift the veil of shadows?"));
+            })).playerName;
+            console.log(Chalk.yellow('Welcome, ' + playerName + "You're about to embark on a journey where every decision matters, and the truth is more elusive than it appears. Are you ready to lift the veil of shadows?'));
+
+            console.log(Chalk.green('VEIL OF SHADOWS.'));
+            // Display ASCII art and introduction
+            console.log(Chalk.yellow('A journey through shadows and truths.'));
+            const asciiArt = await this.loadAsciiArt();
+            if (asciiArt) {
+                console.log(Chalk.green(asciiArt));
+            }
         } catch (error) {
-            
+            console.error(error);
         }
+        
         }
-        console.log(Chalk.green('VEIL OF SHADOWS.'));
-        // Display ASCII art and introduction
-        console.log(Chalk.yellow('A journey through shadows and truths.'));
-        [ascii art here
-        ]
-        // Ask for player name and class
-        console.log(Chalk.yellow('What is your name?'));
-        let playerName = await intput
+
+        this.player = new Player(playerName);
+
+        let classChoice = (await Inquirer.prompt({ 
+            name: 'class',
+            type: 'list',
+            message: 'Choose your class:',
+            choices: ['Investigator', 'Scientist', 'Hacker'],
+        })).class;
+
+        this.player.setClass(classChoice);
         console.log(Chalk.yellow('Choose your class:'));
+        console.log(Chalk.yellow(`${this.player.name} has chosen the class: ${this.player.class}.`));
+
         // Initialize player and game state
+        return classChoice;
     }
 
+    async loadAsciiArt() {
+        const filePath = path.join(__dirname, 'asciiArt.txt');
+        return fs.readFileSync(filePath, 'utf8');
+    }
+}
+
+module.exports = GameManager;
     // Main game loop
     startGameLoop() {
+        while (!this.gameOver) {
+            startGameLoop();
+        }
         // While game is not over
             // Display current scene or puzzle
             // Process player input
