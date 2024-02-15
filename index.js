@@ -1,10 +1,12 @@
-// Assuming ES6 imports are enabled in your Node.js environment
-import GameManager from './src/gameCore/gameManager.js';
-import styles from './src/utils/chalkStyles.js';
+import {styles} from './src/utils/chalkStyles.js';
+import { GameManager } from './src/gameCore/gameManager.js';
 
 async function main() {
-    console.log(styles.title("Welcome to Veil of Shadows"));
-    const gameManager = new GameManager();
+  const title = styles.default.title;
+  const gameManager = new GameManager();
+  await gameManager.initializeGame();
+
+    console.log(title("Welcome to Veil of Shadows"));
 
     await gameManager.initializeGame();
     await gameManager.startGameLoop();
@@ -12,3 +14,4 @@ async function main() {
 }
 
 main().catch(err => console.error("An unexpected error occurred:", err));
+

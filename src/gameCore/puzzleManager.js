@@ -1,9 +1,12 @@
-import Inquirer from 'inquirer'; // Import Inquirer module
-import styles from '../utils/chalkStyles'; // Import styles module
+import Inquirer  from'inquirer';
+import {styles} from '../utils/chalkStyles.js';
 
-class PuzzleManager {
+
+class PuzzleManager {    
     constructor() {
-        this.puzzles = {
+       
+        this.puzzles = {};
+        this.puzzles= {
             decryptMessage: {
                 description: "You've received an encrypted message from Elena Martinez, a former government epidemiologist who quit after having found out the truth about the origins of the pandemic.",
                 question: "I hope you can understand the risks uncovering the truth will bring, I've had to encrypt any important details in this message hope you got what it takes to uncover the truth and help us expose it.",
@@ -14,14 +17,18 @@ class PuzzleManager {
     }
 
     async startPuzzle(puzzleName) {
+        const incorrectAnswer = styles.default.incorrectAnswer;
         const puzzle = this.puzzles[puzzleName];
-        if (!puzzle) {
-            console.log(styles.red('Puzzle not found'));
-            return;
+        try {
+            if (!puzzle) {
+                throw new Error('Puzzle not found');
+            }
+            console.log(styles.default.narrative(puzzle.description));
+            const userAnswer = await this.askQuestion(puzzle.question, puzzle.hint);
+            this.validateAnswer(userAnswer, puzzle.correctAnswer, puzzleName);
+        } catch (error) {
+            console.log(incorrectAnswer(error.message));
         }
-        console.log(styles.narrative(puzzle.description));
-        const userAnswer = await this.askQuestion(puzzle.question, puzzle.hint);
-        this.validateAnswer(userAnswer, puzzle.correctAnswer, puzzleName);
     }
 
     async askQuestion(question, hint) {
@@ -29,7 +36,7 @@ class PuzzleManager {
             {
                 name: 'answer',
                 type: 'input',
-                message: styles.question(question) + styles.hint(`Hint: ${hint}`),
+                message: `${styles.question(question)} Hint: ${styles.hint(hint)}`, // Adjusted for proper string concatenation
             }
         ]);
         return response.answer.toUpperCase();
