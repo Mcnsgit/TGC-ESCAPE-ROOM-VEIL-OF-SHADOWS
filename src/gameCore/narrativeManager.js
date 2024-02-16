@@ -1,58 +1,66 @@
 import inquirer from 'inquirer';
 import fs from 'fs';
 import path from 'path';
-import { styles } from '../utils/chalkStyles.js';
+import chalk from 'chalk'; // Ensure chalk is imported if you're using it for error messages
+import  styles  from '../utils/chalkStyles.js';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+// Assuming __dirname is defined correctly as shown in your original code
+import { fileURLToPath } from 'url';
 
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 class NarrativeManager {
     constructor() {
         this.currentNarrativeState = 'introduction';
         this.characters = {
-            elenaMartine:{
+            elenaMartinez: { 
                 name: "Elena Martinez",
                 roles: "whistleblower",
                 dialogue: {
                     introduction: "The truth is encrypted in this message. I've done all I can to bring it to you. Can you uncover what's hidden?",
                     success: "You've done it! The message you've uncovered could change everything. We're one step closer to the truth.",
-                    failure: "it's difficult, I know. But we can't give up now. The truth is too important. Try Again?"
+                    failure: "It's difficult, I know. But we can't give up now. The truth is too important. Try again?"
                 }
             }
         }
         this.puzzle1 = {
             description: "Decipher the encrypted message to reveal a hidden truth.",
-            hint: "The key might be closer than you think, Pay attention to the patterns.",
-        }
-    }
-
-    async loadInquirer() {
-        this.prompt = inquirer.prompt;
+            hint: "The key might be closer than you think. Pay attention to the patterns.",
+        };
     }
 
     async loadAsciiArt(filename) {
         try {
-          const artPath = path.join(__dirname, '..', 'assets', filename);
-            return fs.promises.readFile(artPath, 'utf8');
+            const artPath = path.join(__dirname, '','assets', filename); 
+            return await fs.promises.readFile(artPath, 'utf8');
         } catch (error) {
-          console.error(chalk.red(`Failed to load ASCII art: ${error}`));
-        return 'ASCII art not found.'
+            console.error(chalk.red(`Failed to load ASCII art: ${error}`));
+            return 'ASCII art not found.';
         }
-      }
+    }
+ 
 
     async displayIntroduction() {
         console.clear();
         const narrative = styles.default.narrative;
-        const title = styles.default.title;
-        const yellow = styles.default.narrative;
         
-        const asciiArt =  this.loadAsciiArt('../assets/title-veil-of-shadows.txt');
-        console.log(yellow(asciiArt));
-        console.log(title("Veil of Shadows"));
-        console.log(narrative("In a world where shadows hide not just secrets, but conspiracies that weave through the very fabric of society, you embark on a journey to uncover truths too dangerous to see the light of day."));
-        console.log(narrative("After months of following elusive leads, your investigation has led you to Elena Martinez, a whistleblower with crucial information on the pandemic's engineered origins."));
+        const asciiArt = await this.loadAsciiArt('title.txt'); 
+        console.log((asciiArt));
+        console.log('\n\n');
+
+        const narrativeintro = `In a world where shadows hide not just secrets, but conspiracies that weave through the very fabric of society, you embark on a journey to uncover truths too dangerous to see the light of day.\n\nAfter months of following elusive leads, your investigation has led you to Elena Martinez, a whistleblower with crucial information on the pandemic's engineered origins.`;
+        await printWithDelay(narrative, 100); // Adjust delay as needed
+    
         await this.continuePrompt();
+        
+    async function printWithDelay(text, delay = 100) {
+        for (const line of text.split('\n')) {
+            await new Promise(resolve => setTimeout(resolve, delay));
+            console.log(line);
+        }
     }
+}
 
     async introduceDecryptMessagePuzzle() {
         const dialogue = styles.default.dialogue;
@@ -79,16 +87,11 @@ class NarrativeManager {
     }
 
     async continuePrompt() {
-        const { continue: input } = await this.prompt({
+        await inquirer.prompt({
             name: 'continue',
-            type: 'input',
+            type: 'confirm',
             message: 'Press enter to continue...',
-            validate: input => input.trim() ? true : 'Please press enter to continue.',
         });
-
-        if (input) {
-            return;
-        }
     }
 }
 

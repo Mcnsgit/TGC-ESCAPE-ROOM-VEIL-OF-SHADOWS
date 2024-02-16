@@ -13,6 +13,7 @@ export const styles = {
   systemMessage: chalk.blue,
   title: chalk.hex('#FFA07A').bold,
   option: chalk.hex('#DAA520').bold,
+  ending: chalk.hex('#F0EAD6').bold
 }
 };
 
@@ -20,3 +21,4 @@ export const stylesTitle = {
   title: chalk.hex('#FFA07A').bold,
 }
 
+export default styles;

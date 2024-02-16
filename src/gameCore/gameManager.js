@@ -2,9 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
-import PuzzleManager from './puzzleManager.js';
+import PuzzleManager from './PuzzleManager.js';
 import NarrativeManager from './NarrativeManager.js';
-import {styles} from '../utils/chalkStyles.js';
+import { styles } from '../utils/chalkStyles.js';
 
 class Player {
   constructor(name, playerClass) {
@@ -21,29 +21,17 @@ class GameManager {
     this.narrativeManager = new NarrativeManager();
   }
 
-
-  
   async initializeGame() {
-    const asciiArt = await this.loadAsciiArt('title-veil-of-shadows.txt');
-    console.log(asciiArt);
-    await this.narrativeManager.displayIntroduction();
-    await this.loadAscii.GameManager.initialize
-    await this.promptForPlayerName();
-    await this.promptForPlayerClass();
-    await this.chooseDifficulty();
-
-    this.startGameLoop();
-
-  } catch(error){
-    console.error(chalk.red(`Failed to load ASCII art: ${error}`));
-  }
-  async loadAsciiArt(filename) {
     try {
-      const artPath = path.join(__dirname, '..', 'assets', filename);
-        return fs.promises.readFile(artPath, 'utf8');
+      const asciiArt =  this.loadAsciiArt('./title-veil-of-shadows.txt');
+      console.log(chalk.green(asciiArt));
+      await this.narrativeManager.displayIntroduction();
+      await this.promptForPlayerName();
+      await this.promptForPlayerClass();
+      await this.chooseDifficulty();
+      this.startGameLoop();
     } catch (error) {
-      console.error(chalk.red(`Failed to load ASCII art: ${error}`));
-    return 'ASCII art not found.'
+      console.error(chalk.red(`Initialization Error: ${error}`));
     }
   }
   async promptForPlayerName() {
@@ -55,6 +43,17 @@ class GameManager {
     });
     this.player = new Player(playerName);
   }
+  
+  async promptForPlayerClass() {
+    const { class: playerClass } = await inquirer.prompt({
+      name: 'class',
+      type: 'list',
+      message: 'Choose your class:',
+      choices: ['Investigator', 'Scientist', 'Hacker'],
+    });
+    this.player.class = playerClass;
+  }
+  
 
   async promptForPlayerClass() {
     const { class: playerClass } = await inquirer.prompt({
@@ -75,40 +74,41 @@ class GameManager {
     });
     this.gameState.difficulty = difficulty;
   }
-
+  
   async startGameLoop() {
-    console.clear();
-    const intro = styles.default.narrative;
-    const title = styles.default.title;
-    const ascii = styles.default.incorrectAnswer;
-    const asciiArt = await this.loadAsciiArt('ascii-art.txt');
-    console.log(ascii(asciiArt));
-    console.log(title('Veil of Shadows'));
-    console.log(intro("In the shadowed corners of a world not unlike our own, you stand at the brink of uncovering truths that have long been shrouded in mystery. 'Veil of Shadows' beckons you into a realm where the line between reality and conspiracy blurs. With only your wit and determination, you're about to dive into an investigation that could change everything—or cost you everything."));
-
-    let gameOver = false;
-    while (!gameOver) {
-      switch (this.gameState.currentScene) {
-        case 'introduction':
-          await this.narrativeManager.displayIntroduction();
-          this.transitionToScene('chooseDifficulty');
-          break;
-        case 'chooseDifficulty':
-          await this.chooseDifficulty();
-          this.transitionToScene('firstPuzzle');
-          break;
-        case 'firstPuzzle':
-          await this.puzzleManager.startPuzzle('DecipherTheCode');
-          this.checkPuzzleOutcome();
-          break;
-        default:
-          console.log(styles.red('The journey concludes... for now.'));
-          gameOver = true;
-          break;
+    try {
+      let gameOver = false;
+      while (!gameOver) {
+        switch (this.gameState.currentScene) {
+          case 'introduction':
+            await this.narrativeManager.displayIntroduction();
+            this.transitionToScene('chooseDifficulty');
+            break;
+          case 'chooseDifficulty':
+            await this.chooseDifficulty();
+            this.transitionToScene('firstPuzzle');
+            break;
+            case 'firstPuzzle':
+            await this.puzzleManager.startPuzzle('DecipherTheCode');
+            this.checkPuzzleOutcome();
+            break;
+            case 'nextScene':
+            await this.narrativeManager.displayNextScene();
+            break;
+            case 'retryPuzzle':
+            await this.puzzleManager.startPuzzle();
+            this.checkPuzzleOutcome();
+            break;
+            default:
+              console.log(styles.green('Thank you for playing Veil of Shadows.'));
+              gameOver = true;
+              break;
+          }
+        }
+      } catch (error) {
+        console.error(chalk.red(`Game Loop Error: ${error}`));
       }
     }
-    console.log(styles.green('Thank you for playing Veil of Shadows.'));
-  }
 
   transitionToScene(sceneId) {
     const systemMessage = styles.default.systemMessage;
