@@ -47,20 +47,25 @@ class NarrativeManager {
         
         const asciiArt = await this.loadAsciiArt('title.txt'); 
         console.log((asciiArt));
-        console.log('\n\n');
+        console.log('\n\n\n');
 
-        const narrativeintro = `In a world where shadows hide not just secrets, but conspiracies that weave through the very fabric of society, you embark on a journey to uncover truths too dangerous to see the light of day.\n\nAfter months of following elusive leads, your investigation has led you to Elena Martinez, a whistleblower with crucial information on the pandemic's engineered origins.`;
-        await printWithDelay(narrative, 100); // Adjust delay as needed
-    
+        const narrativeintro = `In the aftermath of a global pandemic, a world teeters on the edge of truth and deception, freedom and control. "Veil of Shadows" weaves a narrative tapestry rich with conspiracy, where power is a game played in the dark, and the quest for truth is the only light. Through the labyrinth of intrigue, hidden agendas emerge, challenging the very fabric of reality. Here, alliances are forged in whispers, and moral dilemmas echo the complexities of choice. \n\nAs the shadows deepen, revealing the unseen forces molding our destiny, a solitary question remains, whispered on the winds of change: Are you ready to journey through the veil, to fight for a future where truth might finally stand unobscured by power's grasp?`;
+        await printWithDelay(narrativeintro, 400); 
         await this.continuePrompt();
         
-    async function printWithDelay(text, delay = 100) {
-        for (const line of text.split('\n')) {
-            await new Promise(resolve => setTimeout(resolve, delay));
-            console.log(line);
+        async function printWithDelay(text, delay = 100) {
+            if (typeof text !== 'string') {
+                text = 'An unexpected error occurred. Please try again.';
+                console.error('printWithDelay called with non-string text:', text);
+                return; // Early return or convert text to a string if appropriate
+            }
+        
+            for (const line of text.split('\n')) {
+                await new Promise(resolve => setTimeout(resolve, delay));
+                console.log(line);
+            }
         }
-    }
-}
+    }   
 
     async introduceDecryptMessagePuzzle() {
         const dialogue = styles.default.dialogue;
@@ -87,11 +92,14 @@ class NarrativeManager {
     }
 
     async continuePrompt() {
+        const instruction = styles.default.systemMessage;
         await inquirer.prompt({
             name: 'continue',
             type: 'confirm',
             message: 'Press enter to continue...',
         });
+        console.log(instruction(this.inquirer.Prompt));
+        
     }
 }
 
