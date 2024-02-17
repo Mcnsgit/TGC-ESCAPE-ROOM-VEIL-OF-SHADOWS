@@ -1,14 +1,20 @@
 import inquirer from 'inquirer';
-import styles from '../../istattempt/utils/chalkStyles.js';
-import {  decryptMessage } from '../../istattempt/utils/puzzleHelpers.js';
+import styles from '../src/utils/chalkStyles.js';
+import {  decryptMessage } from '../src/utils/puzzleHelpers.js';
 
 
-class DecipherMessagePuzzle {
-    constructor(playerClass) {
-        this.playerClass = playerClass;
+export default class DecipherMessagePuzzle {
+    constructor() {
+        this.playerClass = '';
         this.encryptedMessage = "Gsv xlwv gl gsv Hklovmg: R mvevi rh zmwvihgzb lu gsviv rh gsv Ufm.";
-        this.cipherKey = "";
+        this.cipherKey = '';
     }
+
+    setPlayerClass(playerClass) {
+        this.playerClass = playerClass;
+        this.cipherKey =  this.generateCipherKeyForClass();
+    }
+
     generateCipherKeyForClass() {
         switch (this.playerClass) {
             case 'Investigator':
@@ -23,48 +29,81 @@ class DecipherMessagePuzzle {
     }
 
     async initiatePuzzle() {
-        console.log("Elena Martinez has provided you with crucial information to uncover the conspiracy.");
-        switch (this.playerClass) {
-            case 'Investigator':
-                console.log("I'm relieved you found my email. The truth is hidden deeper than you think. Check the coordinates I sent. What you find there will change everything.");
-                break;
-            case 'Scientist':
-                console.log("Your expertise is crucial now. This sequence isn't natural—it's a message, a blueprint. Decode it, and you'll see the real origin.");
-                break;
-            case 'Hacker':
-                console.log("I knew your skills would lead you here. This backdoor isn't just any entry—it's a gateway to their darkest plans. Be ready for what you'll uncover.");
-                break;
-            default:
-                console.log("An unexpected error occurred. Please try again.");
-                break;
-        }
-        const decryptedMessage = this.simulateDecryption(this.encryptedMessage, this.cipherKey);
+        const narrative = styles.default.narrative;
+        console.log(narrative("Elena Martinez has provided you with crucial information to uncover the conspiracy."));
+        this.displayPuzzleContext();
+        const decryptedMessage = this.decryptMessage(this.encryptedMessage, this.cipherKey);
         this.interpretDecryptedMessage(decryptedMessage);
     }
+        displayPuzzleContext() {
+            const NPC = styles.default.npcDialogue;
+        switch (this.playerClass) {
+            case 'Investigator':
+                console.log(NPC("I'm relieved you found my email. The truth is hidden deeper than you think. Check the coordinates I sent. What you find there will change everything."));
+                break;
+            case 'Scientist':
+                console.log(NPC("Your expertise is crucial now. This sequence isn't natural—it's a message, a blueprint. Decode it, and you'll see the real origin."));
+                break;
+            case 'Hacker':
+                console.log(NPC("I knew your skills would lead you here. This backdoor isn't just any entry—it's a gateway to their darkest plans. Be ready for what you'll uncover."));
+                break;
+            default:
+                console.log(NPC("An unexpected error occurred. Please try again."));
+                break;
+        }
+    }
+    decryptMessage(encryptedMessage, cipherKey) {
+        let decryptedMessage = '';
+        for (let i = 0, j = 0; i < encryptedMessage.length; i++) {
+            const currentChar = encryptedMessage[i];
+            if (currentChar.match(/[a-z]/i)) { // Check if it's a letter
+                const code = encryptedMessage.charCodeAt(i);
+                let shift = cipherKey.charCodeAt(j % cipherKey.length) - 65; // A=0, B=1, C=2, etc.
+                
+                if (code >= 65 && code <= 90) { // Uppercase
+                    decryptedMessage += String.fromCharCode((code - 65 - shift + 26) % 26 + 65);
+                } else if (code >= 97 && code <= 122) { // Lowercase
+                    decryptedMessage += String.fromCharCode((code - 97 - shift + 26) % 26 + 97);
+                }
+                j++;
+            } else {
+                decryptedMessage += currentChar; // Non-alphabetic characters
+            }
+        }
+        return decryptedMessage;
+    }       
+    interpretDecryptedMessage(decryptedMessage) {
+        const correctAnswer = styles.default.correctAnswer;
+        const systemMessage = styles.default.systemMessage;
+        console.log(correctAnswer(`Decrypted message: ${decryptedMessage}`));
+        console.log(systemMessage("Using the information uncovered, you realize the next step in unraveling the conspiracy."));
+    }
+    
 
     async collectKeyFragment() {
+        const systemMessage = styles.default.systemMessage;
         let keyFragment = '';
         switch (this.playerClass) {
             case 'Investigator':
-                console.log("Investigator Challenge: You've received a mysterious map leading to a hidden document.");
+                console.log(systemMessage("Investigator Challenge: You've received a mysterious map leading to a hidden document."));
                 keyFragment = await this.findLibraryKeyFragment();
                 break;
             case 'Scientist':
-                console.log("Scientist Challenge: A genetic puzzle awaits you in Dr. Adrian Shaw's abandoned lab.");
+                console.log(systemMessage("Scientist Challenge: A genetic puzzle awaits you in Dr. Adrian Shaw's abandoned lab."));
                 keyFragment = await this.findLabKeyFragment();
                 break;
             case 'Hacker':
-                console.log("Hacker Challenge: Can you bypass the security of the New Dawn's encrypted server?");
+                console.log(systemMessage("Hacker Challenge: Can you bypass the security of the New Dawn's encrypted server?"));
                 keyFragment = await this.findHackerDenKeyFragment();
                 break;
             default:
-                console.log("An unexpected error occurred. Please try again.");
+                console.log(error("An unexpected error occurred. Please try again."));
                 return;
 
         }
 
         this.cipherKey = keyFragment;
-        console.log(`Key Fragment Collected: ${this.cipherKey}`);
+        console.log(systemMessage("Key Fragment Collected: ${this.cipherKey}"));
     }
     simulateDecryption(encryptedMessage, cipherKey) {
         if (this.playerClass === 'Investigator') {
@@ -170,4 +209,6 @@ async function findLibraryKeyFragment() {
                     }
 
         }
-        export default DecipherMessagePuzzle;
+
+
+        // src/puzzles/decipherMessagePuzzle.js

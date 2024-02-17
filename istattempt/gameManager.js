@@ -1,13 +1,13 @@
-import fs from 'fs';
+import fs from 'fs/promises'; // Use fs/promises for async/await support
 import path from 'path';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
-import PuzzleManager from './puzzleManager.js';
-import NarrativeManager from './narrativeManager.js';
+import PuzzleManager from './PuzzleManager.js';
+import NarrativeManager from './NarrativeManager.js';
 import { styles } from './utils/chalkStyles.js';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
+// const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 class Player {
@@ -26,14 +26,13 @@ class GameManager {
   }
 
   async initializeGame() {
+    console.clear();
     try {
-      console.clear();
-      const introArt = await this.displayAsciiArtForScene('title');
-      console.log(chalk.yellow(introArt));
+      await this.displayAsciiArtForScene('title'); // Assuming 'title.txt' exists in the specified directory
       await this.narrativeManager.displayIntroduction();
       await this.transitionToScene('chooseDifficulty');
     } catch (error) {
-      console.error(`Initialization Error: ${error}`);
+      console.error(chalk.red(`Initialization Error: ${error}`));
     }
   }
 
@@ -51,14 +50,14 @@ class GameManager {
 
   async transitionToScene(sceneId) {
     await this.displayAsciiArtForScene(sceneId);
-    await this.handleScene(sceneId);
+    this.handleScene(sceneId);
   }
 
   async displayAsciiArtForScene(sceneId) {
-    const asciiArtPath = path.join(__dirname, '..', 'assets','asciiArt', `${sceneId}.txt`);
+    const asciiArtPath = path.join(__dirname, 'assets', 'asciiArt', `${sceneId}.txt`);
     try {
       const asciiArt = await fs.readFile(asciiArtPath, 'utf8');
-      console.log(chalk.green(asciiArt));
+      console.log(chalk.yellow(asciiArt));
     } catch (error) {
       console.error(chalk.red(`Error reading ASCII art for scene ${sceneId}: ${error}`));
     }
@@ -82,14 +81,14 @@ class GameManager {
         await this.narrativeManager.displayNextScene();
         break;
       case 'retryPuzzle':
+        // Ensure retryPuzzle method is implemented in PuzzleManager
         await this.puzzleManager.retryPuzzle();
         break;
       default:
-        console.log(chalk.red('Scene not recognized, returning to main menu.'));
+        console.log(chalk.red('Scene not recognized, returning to introduction.'));
         await this.transitionToScene('introduction');
     }
   }
-
   async promptForPlayerClass() {
     const response = await inquirer.prompt({
       name: 'class',

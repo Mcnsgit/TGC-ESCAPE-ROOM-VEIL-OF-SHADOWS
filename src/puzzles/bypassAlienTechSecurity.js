@@ -14,6 +14,8 @@ class BypassAlienTechSecurity {
 
   async hackAttempt() {
     console.log(chalk.green("You're in front of the alien device. Its interface is unlike anything you've seen, but you're ready to hack it."));
+    console.log(this.encryptedDeviceMessage);
+    console.log(chalk.yellow("The device's security is formidable. You'll need to decrypt the message to proceed."));
     const decryptedMessage = await this.decryptDeviceMessage(this.encryptedDeviceMessage, this.decryptionKey);
     
     return Inquirer.prompt([{

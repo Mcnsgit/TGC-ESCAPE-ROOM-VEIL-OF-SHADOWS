@@ -1,12 +1,13 @@
 import inquirer from 'inquirer';
-import styles from '../utils/chalkStyles.js';
-import { decryptMessage } from '../utils/puzzleHelpers.js';
+import styles from '../src/utils/chalkStyles.js';
+import { decryptMessage } from '../src/utils/puzzleHelpers.js';
 
-class DecipherMessagePuzzle {
+export default class DecipherMessagePuzzle {
     constructor() {
         this.playerClass = '';
         this.encryptedMessage = "Gsv xlwv gl gsv Hklovmg: R mvevi rh zmwvihgzb lu gsviv rh gsv Ufm.";
-        this.cipherKey = this.generateCipherKey();
+        // Initialize the cipherKey here to avoid calling generateCipherKey in the constructor
+        this.cipherKey = '';
     }
 
     setPlayerClass(playerClass) {
@@ -24,26 +25,29 @@ class DecipherMessagePuzzle {
     }
 
     async initiatePuzzle() {
-        console.log(styles.narrative("Elena Martinez has provided you with crucial information to uncover the conspiracy."));
+        const narrative = styles.default.narrative;
+        console.log(narrative("Elena Martinez has provided you with crucial information to uncover the conspiracy."));
         await this.presentPuzzleContext();
         const decryptedMessage = this.decryptMessage(this.encryptedMessage, this.cipherKey);
         this.interpretDecryptedMessage(decryptedMessage);
+        await this.verifySolution();
     }
 
     async presentPuzzleContext() {
+        const hint = styles.default.hint;
         let contextMessage;
         switch (this.playerClass) {
             case 'Investigator':
                 contextMessage = "The coordinates you've received lead you to a hidden cache. Inside, you find a coded message.";
                 break;
             case 'Scientist':
-                contextMessage = "Analyzing the genetic sequence, you realize it's encoded with a message. Deciphering it could reveal its origins.";
+                contextMessage =  "Analyzing the genetic sequence, you realize it's encoded with a message. Deciphering it could reveal its origins.";
                 break;
             case 'Hacker':
                 contextMessage = "You've infiltrated a secure network. Among the data, you find an encrypted file.";
                 break;
         }
-        console.log(styles.hint(contextMessage));
+        console.log(hint(contextMessage));
     }
 
     decryptMessage(encryptedMessage, cipherKey) {
@@ -68,11 +72,15 @@ class DecipherMessagePuzzle {
     }
 
     interpretDecryptedMessage(decryptedMessage) {
-        console.log(styles.correctAnswer(`Decrypted message: ${decryptedMessage}`));
-        console.log(styles.systemMessage("Using the information uncovered, you realize the next step in unraveling the conspiracy."));
+        const correctAnswer = styles.default.correctAnswer;
+        const systemMessage = styles.default.systemMessage;
+        console.log(correctAnswer(`Decrypted message: ${decryptedMessage}`));
+        console.log(systemMessage("Using the information uncovered, you realize the next step in unraveling the conspiracy."));
     }
 
     async verifySolution() {
+           const success = styles.default.correctAnswer;
+        const error = styles.default.incorrectAnswer;
         const { isCorrect } = await inquirer.prompt({
             name: 'isCorrect',
             type: 'confirm',
@@ -80,12 +88,11 @@ class DecipherMessagePuzzle {
         });
 
         if (isCorrect) {
-            console.log(styles.success("You've successfully uncovered the truth."));
+         
+            console.log(success("You've successfully uncovered the truth."));
         } else {
-            console.log(styles.error("Let's try deciphering the message again."));
+            console.log(error("Let's try deciphering the message again."));
             await this.solvePuzzle();
         }
     }
 }
-
-export default DecipherMessagePuzzle;

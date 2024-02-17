@@ -31,6 +31,11 @@ class DecryptLeakedDocument {
           if (answer.decryptedMessage.trim().toLowerCase() === decryptedMessage) {
             console.log("Elena responds, 'You've uncovered what many wouldn't dare to believe. This is just the beginning. The truth is far more sinister.'");
             console.log("With the decrypted message, you now have a lead on the pandemic's origins. It's time to investigate the old research facility.");
+            console.log("┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐")
+            console.log("│░▀█▀░█░█░█▀█░█▀█░█░█░░░█░█░█▀█░█░█░░░█▀▀░█▀█░█▀▄░░░█▀█░█░░░█▀█░█░█░▀█▀░█▀█░█░█░█▀▀░░░█░█░█▀▀░▀█▀░█░░░░░█▀█░█▀▀░░░█▀▀░█░█░█▀█░█▀▄░█▀█░█░█░█▀▀│")
+            console.log("│░░█░░█▀█░█▀█░█░█░█▀▄░░░░█░░█░█░█░█░░░█▀▀░█░█░█▀▄░░░█▀▀░█░░░█▀█░░█░░░█░░█░█░█▀█░█░█░░░▀▄▀░█▀▀░░█░░█░░░░░█░█░█▀▀░░░▀▀█░█▀█░█▀█░█░█░█░█░█▄█░▀▀█│") 
+            console.log("│░░▀░░▀░▀░▀░▀░▀░▀░▀░▀░░░░▀░░▀▀▀░▀▀▀░░░▀░░░▀▀▀░▀░▀░░░▀░░░▀▀▀░▀░▀░░▀░░▀▀▀░▀░▀░▀░▀░▀▀▀░░░░▀░░▀▀▀░▀▀▀░▀▀▀░░░▀▀▀░▀░░░░░▀▀▀░▀░▀░▀░▀░▀▀░░▀▀▀░▀░▀░▀▀▀│")
+            console.log("└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘")
             console.log("Thank you for playing the demo for Veil of Shadows. Explore further in the full game.");
             return 'success';
           } else {
@@ -52,6 +57,11 @@ class DecryptLeakedDocument {
             } else {
                 console.log("You decide to investigate further before attempting again. There might be more clues out there.");
                 console.log("Thank you for playing the demo for Veil of Shadows. Explore further in the full game.");
+                console.log("┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐")
+                console.log("│░▀█▀░█░█░█▀█░█▀█░█░█░░░█░█░█▀█░█░█░░░█▀▀░█▀█░█▀▄░░░█▀█░█░░░█▀█░█░█░▀█▀░█▀█░█░█░█▀▀░░░█░█░█▀▀░▀█▀░█░░░░░█▀█░█▀▀░░░█▀▀░█░█░█▀█░█▀▄░█▀█░█░█░█▀▀│")
+                console.log("│░░█░░█▀█░█▀█░█░█░█▀▄░░░░█░░█░█░█░█░░░█▀▀░█░█░█▀▄░░░█▀▀░█░░░█▀█░░█░░░█░░█░█░█▀█░█░█░░░▀▄▀░█▀▀░░█░░█░░░░░█░█░█▀▀░░░▀▀█░█▀█░█▀█░█░█░█░█░█▄█░▀▀█│") 
+                console.log("│░░▀░░▀░▀░▀░▀░▀░▀░▀░▀░░░░▀░░▀▀▀░▀▀▀░░░▀░░░▀▀▀░▀░▀░░░▀░░░▀▀▀░▀░▀░░▀░░▀▀▀░▀░▀░▀░▀░▀▀▀░░░░▀░░▀▀▀░▀▀▀░▀▀▀░░░▀▀▀░▀░░░░░▀▀▀░▀░▀░▀░▀░▀▀░░▀▀▀░▀░▀░▀▀▀│")
+                console.log("└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘")
               }
             }
     // Method to start the decryption challenge
@@ -61,6 +71,10 @@ class DecryptLeakedDocument {
   
     async investigatorFirstChallenge() {
         console.log("The email contains a series of numbers and letters - a cipher key, and an encrypted message. 'The truth is locked behind these characters,' the email concludes.");
+        console.log(cipherKey);
+        console.log(encryptedMessage);        
+        console.log("You recognize the cipher key and encrypted message from your training. It's a simple substitution cipher.");
+
         return inquirer.prompt([{
           type: 'confirm',
           name: 'attemptDecrypt',
@@ -68,11 +82,12 @@ class DecryptLeakedDocument {
         }])
         .then(answer => {
           if (answer.attemptDecrypt) {
-            return this.decryptAttempt(); d
+            return this.decryptAttempt();
           } else {
             console.log("You decide to investigate further before attempting decryption. There might be more clues out there.");
             return 'defer';
           }
+          co
         });
       }
     }
