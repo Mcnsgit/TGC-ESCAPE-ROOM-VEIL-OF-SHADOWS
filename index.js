@@ -1,4 +1,4 @@
-import styles from './src/utils/chalkStyles.js';
+import styles from './istattempt/utils/chalkStyles.js';
 import Inquirer from 'inquirer';
 import Chalk from 'chalk';
 import Investigator from './src/gameCore/classes/investigator.js';  

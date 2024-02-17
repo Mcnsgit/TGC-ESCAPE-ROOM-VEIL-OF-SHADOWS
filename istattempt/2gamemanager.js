@@ -2,9 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
-import PuzzleManager from './PuzzleManager.js';
-import NarrativeManager from './NarrativeManager.js';
-import { styles } from '../utils/chalkStyles.js';
+import PuzzleManager from '../src/gameCore/PuzzleManager.js';
+import NarrativeManager from '../src/gameCore/NarrativeManager.js';
+import { styles } from '../src/utils/chalkStyles.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);

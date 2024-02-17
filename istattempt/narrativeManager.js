@@ -2,7 +2,7 @@ import inquirer from 'inquirer';
 import fs from 'fs/promises';
 import path from 'path';
 import chalk from 'chalk';
-import { styles } from '../utils/chalkStyles.js';
+import { styles } from './utils/chalkStyles.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);

@@ -1,6 +1,6 @@
 import inquirer from 'inquirer';
-import styles from '../utils/chalkStyles.js';
-import {  decryptMessage } from '../utils/puzzleHelpers.js';
+import styles from '../../istattempt/utils/chalkStyles.js';
+import {  decryptMessage } from '../../istattempt/utils/puzzleHelpers.js';
 
 
 class DecipherMessagePuzzle {
