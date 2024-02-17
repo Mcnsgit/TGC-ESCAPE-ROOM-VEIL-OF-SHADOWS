@@ -1,5 +1,3 @@
-const promptForConfirmation = require('./inquirerHelpers');
-
 async function gameSetUp() {
   const playerName = await promptForInput('What is your name?');
   console.log(`Ah yes! Come in quick, ${playerName}. We don't have a lot of time!`);
@@ -16,4 +14,7 @@ async function gameSetUp() {
   }
 }
 
-module.exports = gameSetUp;
+
+
+
+export default gameSetUp;
