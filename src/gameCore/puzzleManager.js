@@ -1,53 +1,54 @@
-import Inquirer  from'inquirer';
-import {styles} from '../utils/chalkStyles.js';
+import inquirer from 'inquirer';
+import { styles } from '../utils/chalkStyles.js';
+import DecipherMessagePuzzle from '../puzzles/decipherMessage.js';
 
-
-class PuzzleManager {    
+class PuzzleManager {
     constructor() {
-       
-        this.puzzles = {};
-        this.puzzles= {
-            decryptMessage: {
-                description: "You've received an encrypted message from Elena Martinez, a former government epidemiologist who quit after having found out the truth about the origins of the pandemic.",
-                question: "I hope you can understand the risks uncovering the truth will bring, I've had to encrypt any important details in this message hope you got what it takes to uncover the truth and help us expose it.",
-                hint: "The message is encrypted with a combination of letters and numbers.",
-                correctAnswer: "CORRECT_ANSWER" // Add the correct answer property
-            }
+        this.puzzles = {
+            decryptMessage: new DecipherMessagePuzzle()
         };
+        
     }
 
-    async startPuzzle(puzzleName) {
-        const incorrectAnswer = styles.default.incorrectAnswer;
-        const puzzle = this.puzzles[puzzleName];
-        try {
-            if (!puzzle) {
-                throw new Error('Puzzle not found');
+        async startPuzzle(puzzleName) {
+            const puzzle = this.puzzles[puzzleName];
+            if (puzzle) {
+              console.log(styles.narrative(`Starting puzzle: ${puzzleName}`));
+              const isSuccess = await puzzle.challengePlayer();
+              this.handlePuzzleOutcome(isSuccess, puzzle);
+            } else {
+              console.log(styles.error('Puzzle not found.'));
             }
-            console.log(styles.default.narrative(puzzle.description));
-            const userAnswer = await this.askQuestion(puzzle.question, puzzle.hint);
-            this.validateAnswer(userAnswer, puzzle.correctAnswer, puzzleName);
-        } catch (error) {
-            console.log(incorrectAnswer(error.message));
+          }
+          
+    async initiatePuzzle(puzzle) {
+        console.log(styles.narrative(puzzle.getDescription()));
+        const { answer } = await inquirer.prompt([{
+            name: 'answer',
+            type: 'input',
+            message: puzzle.getQuestion(),
+        }]);
+
+        if (puzzle.checkAnswer(answer)) {
+            console.log(styles.correctAnswer('Correct! You have successfully solved the puzzle.'));
+        } else {
+            console.log(styles.error('Incorrect. Would you like to try again?'));
+            await this.retryPuzzle(puzzle);
         }
     }
 
-    async askQuestion(question, hint) {
-        const response = await Inquirer.prompt([
-            {
-                name: 'answer',
-                type: 'input',
-                message: `${styles.question(question)} Hint: ${styles.hint(hint)}`, // Adjusted for proper string concatenation
-            }
-        ]);
-        return response.answer.toUpperCase();
-    }
+    async retryPuzzle(puzzle) {
+        const { tryAgain } = await inquirer.prompt([{
+            name: 'tryAgain',
+            type: 'confirm',
+            message: 'Try again?',
+        }]);
 
-    validateAnswer(userAnswer, correctAnswer, puzzleName) {
-        if (userAnswer === correctAnswer.toUpperCase()) {
-            console.log(styles.correctAnswer("Correct! You've deciphered the message"));
+        if (tryAgain) {
+            await this.initiatePuzzle(puzzle);
         } else {
-            console.log(styles.incorrectAnswer("That's not quite right. Try again?"));
-            this.startPuzzle(puzzleName);
+            console.log(styles.systemMessage('Moving on to the next challenge.'));
+            // Logic to move on or handle the choice of not retrying the puzzle
         }
     }
 }
